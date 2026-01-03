@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coach Entraînement</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: #fff;
+  margin: 0;
+  padding: 15px;
+}
+h1, h2 {
+  text-align: center;
+}
+.section {
+  background: #1e1e1e;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+input, select, textarea, button {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+}
+button {
+  background: #00c853;
+  color: black;
+  font-weight: bold;
+}
+.exercise {
+  border-bottom: 1px solid #333;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+.small {
+  font-size: 0.85em;
+  color: #bbb;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🏋️ Coach Entraînement</h1>
+<p class="small" style="text-align:center;">
+Dos large • Bras • Fessiers • Safe dos/coudes
+</p>
+
+<div class="section">
+<h2>📅 Séance</h2>
+<select id="day">
+  <option>Jour 1 – Fessiers</option>
+  <option>Jour 2 – Dos & Bras</option>
+  <option>Jour 3 – Full Body Bias</option>
+</select>
+<input id="date" type="date">
+</div>
+
+<div class="section">
+<h2>📝 Exercice</h2>
+
+<div class="exercise">
+<input placeholder="Exercice (ex: Lat Pulldown)">
+<input placeholder="Charge">
+<input placeholder="Reps">
+<input placeholder="RPE">
+<textarea placeholder="Notes / Douleur (dos, coudes)"></textarea>
+</div>
+
+<button onclick="saveSession()">💾 Sauvegarder la séance</button>
+</div>
+
+<div class="section">
+<h2>📊 Historique</h2>
+<div id="history"></div>
+</div>
+
+<script>
+function saveSession() {
+  const session = {
+    day: document.getElementById("day").value,
+    date: document.getElementById("date").value,
+    exercises: []
+  };
+
+  document.querySelectorAll(".exercise").forEach(ex => {
+    const inputs = ex.querySelectorAll("input, textarea");
+    session.exercises.push({
+      name: inputs[0].value,
+      load: inputs[1].value,
+      reps: inputs[2].value,
+      rpe: inputs[3].value,
+      notes: inputs[4].value
+    });
+  });
+
+  let data = JSON.parse(localStorage.getItem("training")) || [];
+  data.push(session);
+  localStorage.setItem("training", JSON.stringify(data));
+
+  alert("Séance sauvegardée");
+  loadHistory();
+}
+
+function loadHistory() {
+  const container = document.getElementById("history");
+  container.innerHTML = "";
+  const data = JSON.parse(localStorage.getItem("training")) || [];
+
+  data.reverse().forEach(s => {
+    const div = document.createElement("div");
+    div.className = "exercise";
+    div.innerHTML = `
+      <strong>${s.day}</strong> — ${s.date}<br>
+      ${s.exercises.map(e =>
+        `${e.name} | ${e.load} | ${e.reps} | RPE ${e.rpe}<br>
+         <span class="small">${e.notes}</span>`
+      ).join("<hr>")}
+    `;
+    container.appendChild(div);
+  });
+}
+
+loadHistory();
+</script>
+
+</body>
+</html>
